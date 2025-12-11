@@ -1,0 +1,40 @@
+{
+    "name": "f",
+    "appid": "__UNI__XXXXXX",
+    "description": "房东租房管理微信小程序",
+    "versionName": "1.0.0",
+    "versionCode": "100",
+    "transformPx": false,
+    "app-plus": {
+        "usingComponents": true,
+        "nvueCompiler": "uni-app",
+        "splashscreen": {
+            "alwaysShowBeforeRender": true,
+            "waiting": true,
+            "autoclose": true,
+            "delay": 0
+        },
+        "modules": {}
+    },
+    "quickapp": {},
+    "mp-weixin": {
+        "appid": "your-appid-here",
+        "setting": {
+            "urlCheck": false,
+            "es6": true,
+            "postcss": true,
+            "minified": true
+        },
+        "usingComponents": true,
+        "requiredPrivateInfos": [
+            "getLocation"
+        ],
+        "permission": {
+            "scope.userLocation": {
+                "desc": "你的位置信息将用于楼栋定位"
+            }
+        },
+        "lazyCodeLoading": "requiredComponents"
+    },
+    "vueVersion": "3"
+}

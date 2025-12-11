@@ -1,0 +1,21 @@
+{
+  "name": "f",
+  "version": "1.0.0",
+  "description": "房东租房管理微信小程序",
+  "scripts": {
+    "dev:mp-weixin": "uni -p mp-weixin",
+    "build:mp-weixin": "uni build -p mp-weixin"
+  },
+  "dependencies": {
+    "@dcloudio/uni-app": "^3.0.0-4010520250219001",
+    "@dcloudio/uni-mp-weixin": "^3.0.0-4010520250219001",
+    "@dcloudio/uni-components": "^3.0.0-4010520250219001",
+    "vue": "^3.4.21",
+    "pinia": "^2.1.7"
+  },
+  "devDependencies": {
+    "@dcloudio/uni-cli": "^3.0.0-4010520250219001",
+    "@dcloudio/uni-cli-shared": "^3.0.0-4010520250219001",
+    "vite": "^5.2.8"
+  }
+}
