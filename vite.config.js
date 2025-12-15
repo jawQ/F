@@ -7,8 +7,10 @@ export default defineConfig({
     css: {
         preprocessorOptions: {
             scss: {
+                api: 'modern-compiler', // Use modern Sass API
                 // 自动导入全局变量
-                additionalData: '@import "@/uni.scss";'
+                additionalData: '@import "@/uni.scss";',
+                silenceDeprecations: ['legacy-js-api', 'import']
             }
         }
     }

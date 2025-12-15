@@ -1,0 +1,7 @@
+/node_modules
+/.env.local
+/dist
+/logs
+/config/config.local.ts
+# Ignore all markdown files in the .github directory that end with -instructions.md
+.github/**/*-instructions.md

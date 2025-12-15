@@ -53,7 +53,6 @@ export default {
 
 <style lang="scss">
 /* 全局样式 */
-@import './uni.scss';
 
 page {
   background-color: #f5f5f5;
