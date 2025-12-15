@@ -11,7 +11,7 @@ export default {
     // 初始化云开发
     if (wx.cloud) {
       wx.cloud.init({
-        env: 'your-env-id', // 替换为你的云开发环境ID
+        env: import.meta.env.VITE_WX_ENV_ID,
         traceUser: true
       })
     }

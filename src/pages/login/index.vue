@@ -11,8 +11,8 @@
       <!-- 登录方式选择 -->
       <view class="login-methods">
         <!-- 微信一键登录 -->
-        <button 
-          class="login-btn wechat-btn" 
+        <button
+          class="login-btn wechat-btn"
           open-type="getUserInfo"
           @click="handleWxLogin"
         >
@@ -21,7 +21,7 @@
         </button>
 
         <!-- 获取手机号登录 -->
-        <button 
+        <button
           class="login-btn phone-btn"
           open-type="getPhoneNumber"
           @getphonenumber="handleGetPhoneNumber"
@@ -41,34 +41,34 @@
         <view class="phone-login-form">
           <view class="input-group">
             <text class="input-prefix">+86</text>
-            <input 
-              class="input" 
-              type="number" 
+            <input
+              class="input"
+              type="number"
               v-model="phone"
               placeholder="请输入手机号"
               maxlength="11"
             />
           </view>
-          
+
           <view class="input-group">
-            <input 
-              class="input code-input" 
-              type="number" 
+            <input
+              class="input code-input"
+              type="number"
               v-model="smsCode"
               placeholder="请输入验证码"
               maxlength="6"
             />
-            <button 
+            <button
               class="send-code-btn"
               :class="{ disabled: countdown > 0 }"
               :disabled="countdown > 0"
               @click="sendCode"
             >
-              {{ countdown > 0 ? `${countdown}s` : '获取验证码' }}
+              {{ countdown > 0 ? `${countdown}s` : "获取验证码" }}
             </button>
           </view>
 
-          <button 
+          <button
             class="login-btn submit-btn"
             :class="{ disabled: !canSubmit }"
             :disabled="!canSubmit"
@@ -93,171 +93,189 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
-import { useUserStore } from '@/store/user'
-import { callCloud } from '@/utils/cloud'
+import { ref, computed } from "vue";
+import { useUserStore } from "@/store/user";
+import { callCloud } from "@/utils/cloud";
 
 export default {
   setup() {
-    const userStore = useUserStore()
-    
-    const phone = ref('')
-    const smsCode = ref('')
-    const countdown = ref(0)
-    let countdownTimer = null
-    
+    const userStore = useUserStore();
+
+    const phone = ref("");
+    const smsCode = ref("");
+    const countdown = ref(0);
+    let countdownTimer = null;
+
     // 是否可提交
     const canSubmit = computed(() => {
-      return phone.value.length === 11 && smsCode.value.length === 6
-    })
-    
+      return phone.value.length === 11 && smsCode.value.length === 6;
+    });
+
     // 微信登录
     const handleWxLogin = async () => {
-      uni.showLoading({ title: '登录中...', mask: true })
-      
+      uni.showLoading({ title: "登录中...", mask: true });
+
       try {
-        const result = await callCloud('login', {
-          action: 'wxLogin'
-        }, { showLoading: false })
-        
-        uni.hideLoading()
-        
+        const result = await callCloud(
+          "login",
+          {
+            action: "wxLogin",
+          },
+          { showLoading: false }
+        ).catch((err) => {
+          console.error("微信登录失败:", err);
+        });
+        console.log("查看result： ", result);
+
+        uni.hideLoading();
+
         if (result) {
-          userStore.setToken(result.token)
-          userStore.setUserInfo(result.userInfo)
-          
+          userStore.setToken(result.token);
+          userStore.setUserInfo(result.userInfo);
+
           uni.showToast({
-            title: '登录成功',
-            icon: 'success'
-          })
-          
+            title: "登录成功",
+            icon: "success",
+          });
+
           setTimeout(() => {
-            uni.switchTab({ url: '/pages/index/index' })
-          }, 1000)
+            uni.switchTab({ url: "/pages/index/index" });
+          }, 1000);
         }
       } catch (error) {
-        uni.hideLoading()
-        console.error('微信登录失败:', error)
+        uni.hideLoading();
+        console.error("微信登录失败:", error);
       }
-    }
-    
+    };
+
     // 获取手机号
     const handleGetPhoneNumber = async (e) => {
-      if (e.detail.errMsg !== 'getPhoneNumber:ok') {
-        uni.showToast({ title: '取消了授权', icon: 'none' })
-        return
+      if (e.detail.errMsg !== "getPhoneNumber:ok") {
+        uni.showToast({ title: "取消了授权", icon: "none" });
+        return;
       }
-      
-      const { cloudID } = e.detail
+
+      const { cloudID } = e.detail;
       if (!cloudID) {
-        uni.showToast({ title: '获取失败', icon: 'none' })
-        return
+        uni.showToast({ title: "获取失败", icon: "none" });
+        return;
       }
-      
-      uni.showLoading({ title: '登录中...', mask: true })
-      
+
+      uni.showLoading({ title: "登录中...", mask: true });
+
       try {
         // 先进行微信登录
-        const loginResult = await callCloud('login', {
-          action: 'wxLogin'
-        }, { showLoading: false })
-        
+        const loginResult = await callCloud(
+          "login",
+          {
+            action: "wxLogin",
+          },
+          { showLoading: false }
+        );
+
         if (loginResult) {
-          userStore.setToken(loginResult.token)
-          userStore.setUserInfo(loginResult.userInfo)
+          userStore.setToken(loginResult.token);
+          userStore.setUserInfo(loginResult.userInfo);
         }
-        
+
         // 获取手机号
-        const phoneResult = await callCloud('login', {
-          action: 'getPhoneNumber',
-          cloudID
-        }, { showLoading: false })
-        
-        uni.hideLoading()
-        
+        const phoneResult = await callCloud(
+          "login",
+          {
+            action: "getPhoneNumber",
+            cloudID,
+          },
+          { showLoading: false }
+        );
+
+        uni.hideLoading();
+
         if (phoneResult && phoneResult.phone) {
           // 更新用户信息
-          const userInfo = userStore.userInfo || {}
-          userInfo.phone = phoneResult.phone
-          userStore.setUserInfo(userInfo)
-          
+          const userInfo = userStore.userInfo || {};
+          userInfo.phone = phoneResult.phone;
+          userStore.setUserInfo(userInfo);
+
           uni.showToast({
-            title: '登录成功',
-            icon: 'success'
-          })
-          
+            title: "登录成功",
+            icon: "success",
+          });
+
           setTimeout(() => {
-            uni.switchTab({ url: '/pages/index/index' })
-          }, 1000)
+            uni.switchTab({ url: "/pages/index/index" });
+          }, 1000);
         }
       } catch (error) {
-        uni.hideLoading()
-        console.error('获取手机号失败:', error)
+        uni.hideLoading();
+        console.error("获取手机号失败:", error);
       }
-    }
-    
+    };
+
     // 发送验证码
     const sendCode = async () => {
       if (phone.value.length !== 11) {
-        uni.showToast({ title: '请输入正确的手机号', icon: 'none' })
-        return
+        uni.showToast({ title: "请输入正确的手机号", icon: "none" });
+        return;
       }
-      
-      if (countdown.value > 0) return
-      
+
+      if (countdown.value > 0) return;
+
       try {
-        await callCloud('sendSmsCode', {
-          phone: phone.value
-        })
-        
+        await callCloud("sendSmsCode", {
+          phone: phone.value,
+        });
+
         // 开始倒计时
-        countdown.value = 60
+        countdown.value = 60;
         countdownTimer = setInterval(() => {
-          countdown.value--
+          countdown.value--;
           if (countdown.value <= 0) {
-            clearInterval(countdownTimer)
+            clearInterval(countdownTimer);
           }
-        }, 1000)
-        
+        }, 1000);
       } catch (error) {
-        console.error('发送验证码失败:', error)
+        console.error("发送验证码失败:", error);
       }
-    }
-    
+    };
+
     // 手机号验证码登录
     const handlePhoneLogin = async () => {
-      if (!canSubmit.value) return
-      
-      uni.showLoading({ title: '登录中...', mask: true })
-      
+      if (!canSubmit.value) return;
+
+      uni.showLoading({ title: "登录中...", mask: true });
+
       try {
-        const result = await callCloud('login', {
-          action: 'phoneLogin',
-          phone: phone.value,
-          code: smsCode.value
-        }, { showLoading: false })
-        
-        uni.hideLoading()
-        
+        const result = await callCloud(
+          "login",
+          {
+            action: "phoneLogin",
+            phone: phone.value,
+            code: smsCode.value,
+          },
+          { showLoading: false }
+        );
+
+        uni.hideLoading();
+
         if (result) {
-          userStore.setToken(result.token)
-          userStore.setUserInfo(result.userInfo)
-          
+          userStore.setToken(result.token);
+          userStore.setUserInfo(result.userInfo);
+
           uni.showToast({
-            title: '登录成功',
-            icon: 'success'
-          })
-          
+            title: "登录成功",
+            icon: "success",
+          });
+
           setTimeout(() => {
-            uni.switchTab({ url: '/pages/index/index' })
-          }, 1000)
+            uni.switchTab({ url: "/pages/index/index" });
+          }, 1000);
         }
       } catch (error) {
-        uni.hideLoading()
-        console.error('登录失败:', error)
+        uni.hideLoading();
+        console.error("登录失败:", error);
       }
-    }
-    
+    };
+
     return {
       phone,
       smsCode,
@@ -266,16 +284,16 @@ export default {
       handleWxLogin,
       handleGetPhoneNumber,
       sendCode,
-      handlePhoneLogin
-    }
-  }
-}
+      handlePhoneLogin,
+    };
+  },
+};
 </script>
 
 <style lang="scss" scoped>
 .page {
   min-height: 100vh;
-  background: linear-gradient(180deg, #EFF6FF 0%, #fff 50%);
+  background: linear-gradient(180deg, #eff6ff 0%, #fff 50%);
 }
 
 .login-container {
@@ -325,7 +343,7 @@ export default {
     }
 
     &.wechat-btn {
-      background: #07C160;
+      background: #07c160;
       color: #fff;
     }
 
@@ -336,7 +354,7 @@ export default {
     }
 
     &.submit-btn {
-      background: #3B82F6;
+      background: #3b82f6;
       color: #fff;
       margin-top: 32rpx;
 
@@ -397,7 +415,7 @@ export default {
     .send-code-btn {
       padding: 16rpx 24rpx;
       font-size: 26rpx;
-      color: #3B82F6;
+      color: #3b82f6;
       background: transparent;
       border: none;
       white-space: nowrap;
@@ -418,7 +436,7 @@ export default {
     color: #9ca3af;
 
     .link {
-      color: #3B82F6;
+      color: #3b82f6;
     }
   }
 }
