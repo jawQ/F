@@ -5,16 +5,13 @@
 </template>
 
 <script>
+import { initCloud } from '@/utils/cloud'
+
 export default {
   onLaunch() {
     console.log('App Launch')
     // 初始化云开发
-    if (wx.cloud) {
-      wx.cloud.init({
-        env: import.meta.env.VITE_WX_ENV_ID,
-        traceUser: true
-      })
-    }
+    initCloud()
     
     // 检查登录态
     this.checkLogin()

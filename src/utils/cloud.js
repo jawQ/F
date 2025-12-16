@@ -4,7 +4,9 @@
  */
 
 // 云开发环境ID（需要在微信开发者工具中配置）
-const ENV_ID = 'your-env-id'
+// 云开发环境ID（需要在微信开发者工具中配置）
+const ENV_ID = import.meta.env.VITE_WX_ENV_ID
+
 
 /**
  * 初始化云开发
@@ -19,6 +21,7 @@ export function initCloud() {
         env: ENV_ID,
         traceUser: true
     })
+    console.log('Cloud initialized with env:', ENV_ID)
 
     return true
 }
@@ -44,10 +47,20 @@ export async function callCloud(name, data = {}, options = {}) {
         uni.showLoading({ title: loadingText, mask: true })
     }
 
+    // 自动注入 token
+    // 登录相关接口不需要 token，避免 token 过期导致死循环
+    const whiteList = ['login', 'sendSmsCode']
+    const token = uni.getStorageSync('token')
+    const finalData = { ...data }
+
+    if (token && !whiteList.includes(name)) {
+        finalData.token = token
+    }
+
     try {
         const res = await wx.cloud.callFunction({
             name,
-            data
+            data: finalData
         })
 
         if (showLoading) {
