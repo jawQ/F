@@ -19,7 +19,7 @@ export function initCloud() {
 
     wx.cloud.init({
         env: ENV_ID,
-        traceUser: true
+        traceUser: false
     })
     console.log('Cloud initialized with env:', ENV_ID)
 

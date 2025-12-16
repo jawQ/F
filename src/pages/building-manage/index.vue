@@ -16,7 +16,8 @@
         </view>
         <view class="building-meta">
           <text class="room-count">{{ building.roomCount || 0 }}间房</text>
-          <view class="building-actions">
+            <view class="building-actions">
+            <text class="action-btn manage" @click="manageRooms(building)">管理房间</text>
             <text class="action-btn edit" @click="editBuilding(building)">编辑</text>
             <text class="action-btn delete" @click="deleteBuilding(building)">删除</text>
           </view>
@@ -221,7 +222,12 @@ export default {
       editBuilding,
       deleteBuilding,
       submitForm,
-      closePopup
+      closePopup,
+      manageRooms: (building) => {
+        uni.navigateTo({
+          url: `/pages/room-manage/index?buildingId=${building._id}&buildingName=${building.name}`
+        })
+      }
     }
   }
 }
@@ -294,6 +300,11 @@ export default {
           font-size: 26rpx;
           padding: 8rpx 20rpx;
           border-radius: 8rpx;
+
+          &.manage {
+            color: #10B981;
+            background: #ECFDF5;
+          }
 
           &.edit {
             color: #3B82F6;
