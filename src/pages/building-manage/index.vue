@@ -236,43 +236,58 @@ export default {
 <style lang="scss" scoped>
 .page {
   min-height: 100vh;
-  background: #f5f5f5;
-  padding: 24rpx;
-  padding-bottom: 180rpx;
+  background: $bg-color;
+  padding: 32rpx;
+  padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
 }
 
 .building-list {
   .building-card {
-    background: #fff;
-    border-radius: 24rpx;
-    padding: 28rpx;
-    margin-bottom: 24rpx;
-    box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05);
+    background: $bg-white;
+    border-radius: $radius-md;
+    padding: 32rpx;
+    margin-bottom: 32rpx;
+    box-shadow: $shadow-sm;
+    transition: all 0.2s ease;
+    
+    &:active {
+      transform: scale(0.98);
+      box-shadow: none;
+    }
 
     .building-info {
       display: flex;
-      align-items: center;
-      margin-bottom: 20rpx;
+      align-items: flex-start;
+      margin-bottom: 24rpx;
 
       .building-icon {
-        font-size: 48rpx;
-        margin-right: 20rpx;
+        font-size: 80rpx;
+        margin-right: 24rpx;
+        background: $bg-color;
+        border-radius: $radius-md;
+        width: 120rpx;
+        height: 120rpx;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       .building-detail {
         flex: 1;
+        padding-top: 8rpx;
 
         .building-name {
-          font-size: 32rpx;
-          font-weight: 600;
-          color: #1f2937;
+          font-size: $font-size-lg;
+          font-weight: 700;
+          color: $text-main;
           display: block;
+          margin-bottom: 8rpx;
         }
 
         .building-address {
-          font-size: 26rpx;
-          color: #6b7280;
-          margin-top: 6rpx;
+          font-size: $font-size-sm;
+          color: $text-secondary;
+          line-height: 1.4;
         }
       }
     }
@@ -281,37 +296,43 @@ export default {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-top: 20rpx;
-      border-top: 1rpx solid #f3f4f6;
+      padding-top: 24rpx;
+      border-top: 1rpx solid $border-color;
 
       .room-count {
-        font-size: 26rpx;
-        color: #3B82F6;
-        background: #EFF6FF;
-        padding: 8rpx 20rpx;
-        border-radius: 20rpx;
+        font-size: $font-size-xs;
+        color: $primary-color;
+        background: rgba($primary-color, 0.1);
+        padding: 6rpx 20rpx;
+        border-radius: $radius-full;
+        font-weight: 600;
       }
 
       .building-actions {
         display: flex;
-        gap: 24rpx;
+        gap: 20rpx;
 
         .action-btn {
-          font-size: 26rpx;
-          padding: 8rpx 20rpx;
-          border-radius: 8rpx;
+          font-size: $font-size-sm;
+          padding: 10rpx 24rpx;
+          border-radius: $radius-sm;
+          font-weight: 500;
+          transition: background 0.2s;
 
           &.manage {
-            color: #10B981;
-            background: #ECFDF5;
+            color: #fff;
+            background: $success-color;
+            box-shadow: 0 4rpx 12rpx rgba($success-color, 0.3);
           }
 
           &.edit {
-            color: #3B82F6;
+            color: $text-secondary;
+            background: $bg-color;
           }
 
           &.delete {
-            color: #EF4444;
+            color: $error-color;
+            background: rgba($error-color, 0.1);
           }
         }
       }
@@ -323,115 +344,133 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 100rpx 0;
+  padding: 120rpx 0;
 
   .empty-icon {
-    font-size: 100rpx;
-    margin-bottom: 24rpx;
+    font-size: 120rpx;
+    margin-bottom: 32rpx;
+    opacity: 0.8;
   }
 
   .empty-text {
-    font-size: 32rpx;
-    color: #1f2937;
+    font-size: $font-size-lg;
+    color: $text-main;
+    font-weight: 600;
     margin-bottom: 12rpx;
   }
 
   .empty-tips {
-    font-size: 26rpx;
-    color: #9ca3af;
+    font-size: $font-size-sm;
+    color: $text-placeholder;
   }
 }
 
 .add-btn-wrapper {
   position: fixed;
-  bottom: 0;
+  bottom: calc(40rpx + env(safe-area-inset-bottom));
   left: 0;
   right: 0;
-  padding: 24rpx 48rpx;
-  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
-  background: #fff;
-  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: center;
+  pointer-events: none; // 让 wrapper 不阻挡点击，只有按钮阻挡
 
   .add-btn {
-    width: 100%;
+    pointer-events: auto;
+    width: 320rpx;
     height: 96rpx;
-    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+    background: $primary-gradient;
     color: #fff;
-    font-size: 32rpx;
-    font-weight: 500;
-    border-radius: 48rpx;
+    font-size: $font-size-base;
+    font-weight: 600;
+    border-radius: $radius-full;
     display: flex;
     align-items: center;
     justify-content: center;
     border: none;
+    box-shadow: $shadow-float;
+    transition: transform 0.2s;
+    
+    &:active {
+      transform: scale(0.95);
+    }
 
     .add-icon {
       font-size: 40rpx;
       margin-right: 12rpx;
+      margin-bottom: 4rpx;
     }
   }
 }
 
 .form-popup {
   width: 600rpx;
-  background: #fff;
-  border-radius: 24rpx;
-  padding: 40rpx;
+  background: $bg-white;
+  border-radius: $radius-lg;
+  padding: 48rpx;
 
   .popup-title {
-    font-size: 36rpx;
-    font-weight: 600;
-    color: #1f2937;
+    font-size: $font-size-xl;
+    font-weight: 700;
+    color: $text-main;
     text-align: center;
-    margin-bottom: 40rpx;
+    margin-bottom: 48rpx;
+    display: block;
   }
 
   .form-group {
-    margin-bottom: 28rpx;
+    margin-bottom: 32rpx;
 
     .form-label {
-      font-size: 28rpx;
-      color: #374151;
-      margin-bottom: 12rpx;
+      font-size: $font-size-sm;
+      color: $text-main;
+      margin-bottom: 16rpx;
       display: block;
+      font-weight: 500;
     }
 
     .form-input {
       width: 100%;
-      height: 88rpx;
-      background: #f9fafb;
-      border: 2rpx solid #e5e7eb;
-      border-radius: 16rpx;
-      padding: 0 24rpx;
-      font-size: 30rpx;
-      color: #1f2937;
+      height: 96rpx;
+      background: $bg-color;
+      border: 2rpx solid transparent;
+      border-radius: $radius-md;
+      padding: 0 32rpx;
+      font-size: $font-size-base;
+      color: $text-main;
+      transition: all 0.2s;
+      
+      &:focus {
+        background: #fff;
+        border-color: $primary-color;
+      }
     }
   }
 
   .popup-actions {
     display: flex;
-    gap: 24rpx;
-    margin-top: 40rpx;
+    gap: 32rpx;
+    margin-top: 56rpx;
 
     .popup-btn {
       flex: 1;
-      height: 88rpx;
-      border-radius: 44rpx;
-      font-size: 30rpx;
-      font-weight: 500;
+      height: 96rpx;
+      border-radius: $radius-full;
+      font-size: $font-size-base;
+      font-weight: 600;
       display: flex;
       align-items: center;
       justify-content: center;
       border: none;
 
       &.cancel {
-        background: #f3f4f6;
-        color: #6b7280;
+        background: $bg-color;
+        color: $text-secondary;
       }
 
       &.confirm {
-        background: #3B82F6;
+        background: $primary-color;
         color: #fff;
+        box-shadow: 0 4rpx 16rpx rgba($primary-color, 0.3);
       }
     }
   }

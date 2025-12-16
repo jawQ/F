@@ -6,6 +6,7 @@
 
 <script>
 import { initCloud } from '@/utils/cloud'
+import { useUserStore } from '@/store/user'
 
 export default {
   onLaunch() {
@@ -33,17 +34,11 @@ export default {
       
       if (token && userInfo) {
         // 已登录，更新 store
-        const store = getApp().globalData?.store
-        if (store) {
-          store.setUserInfo(userInfo)
-          store.setToken(token)
-        }
+        const userStore = useUserStore()
+        userStore.setUserInfo(userInfo)
+        userStore.setToken(token)
       }
     }
-  },
-  
-  globalData: {
-    store: null
   }
 }
 </script>

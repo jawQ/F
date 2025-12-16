@@ -4,7 +4,7 @@
     <view class="room-header">
       <image 
         class="room-image" 
-        :src="room.roomImage || '/static/images/room-default.png'" 
+        :src="room.roomImage || '/static/images/room-default.svg'" 
         mode="aspectFill"
       />
       <view class="room-overlay">

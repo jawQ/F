@@ -22,7 +22,7 @@
     >
       <!-- 空状态 -->
       <view v-if="!loading && roomList.length === 0" class="empty-state">
-        <image class="empty-icon" src="/static/icons/empty.png" mode="aspectFit" />
+        <image class="empty-icon" src="/static/icons/empty.svg" mode="aspectFit" />
         <text class="empty-text">暂无待缴房租</text>
         <text class="empty-tips">七天内没有需要缴纳房租的房间</text>
       </view>
@@ -36,7 +36,7 @@
       >
         <image 
           class="room-image" 
-          :src="room.roomImage || '/static/images/room-default.png'" 
+          :src="room.roomImage || '/static/images/room-default.svg'" 
           mode="aspectFill"
         />
         <view class="room-info">
@@ -76,6 +76,12 @@
         </scroll-view>
       </view>
     </uni-popup>
+
+    <!-- 悬浮入口 -->
+    <view class="floating-btn" @click="goToRoomManage" v-if="currentBuildingId">
+      <text class="floating-icon">🏠</text>
+      <text class="floating-text">管理</text>
+    </view>
 
     <!-- 加载状态 -->
     <view v-if="loading" class="loading">
@@ -195,7 +201,6 @@ export default {
       }
     }
     
-    // 格式化截止日期
     const formatDueDate = (date) => {
       return getRelativeTime(date)
     }
@@ -208,6 +213,18 @@ export default {
         paid: '已缴'
       }
       return statusMap[status] || status
+    }
+    
+    // 跳转到房间管理
+    const goToRoomManage = () => {
+      if (!currentBuildingId.value) {
+        uni.showToast({ title: '请先选择楼栋', icon: 'none' })
+        return
+      }
+      
+      uni.navigateTo({
+        url: `/pages/room-manage/index?buildingId=${currentBuildingId.value}&buildingName=${currentBuildingName.value}`
+      })
     }
     
     // 页面加载
@@ -237,7 +254,8 @@ export default {
       selectBuilding,
       closeBuildingPicker,
       formatDueDate,
-      getStatusText
+      getStatusText,
+      goToRoomManage
     }
   }
 }
@@ -246,45 +264,66 @@ export default {
 <style lang="scss" scoped>
 .page {
   min-height: 100vh;
-  background: linear-gradient(180deg, #3B82F6 0%, #1E40AF 100%);
+  background: $bg-color;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .header {
-  padding: 40rpx 32rpx 60rpx;
+  padding: 40rpx 32rpx 80rpx;
+  background: $primary-gradient;
+  border-radius: 0 0 $radius-lg $radius-lg;
   color: #fff;
+  position: relative;
+  z-index: 1;
 
   .building-selector {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    margin-bottom: 24rpx;
+    padding: 12rpx 24rpx;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: $radius-full;
+    margin-bottom: 32rpx;
+    border: 1rpx solid rgba(255, 255, 255, 0.2);
 
     .building-name {
-      font-size: 36rpx;
+      font-size: $font-size-base;
       font-weight: 600;
       margin-right: 12rpx;
+    }
+    
+    .iconfont {
+      font-size: $font-size-sm;
+      opacity: 0.8;
+    }
+    
+    &:active {
+      background: rgba(255, 255, 255, 0.25);
     }
   }
 
   .date-info {
     .date {
-      font-size: 48rpx;
+      font-size: 56rpx;
       font-weight: 700;
       display: block;
-      margin-bottom: 8rpx;
+      margin-bottom: 12rpx;
+      letter-spacing: 1rpx;
     }
 
     .tips {
-      font-size: 28rpx;
-      opacity: 0.85;
+      font-size: $font-size-base;
+      opacity: 0.9;
     }
   }
 }
 
 .room-list {
-  min-height: calc(100vh - 280rpx);
-  background: #f5f5f5;
-  border-radius: 40rpx 40rpx 0 0;
-  padding: 32rpx;
+  min-height: calc(100vh - 360rpx);
+  margin-top: -40rpx;
+  padding: 0 32rpx 32rpx;
+  position: relative;
+  z-index: 2;
 }
 
 .empty-state {
@@ -292,46 +331,48 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 120rpx 0;
+  padding: 160rpx 0;
 
   .empty-icon {
-    width: 200rpx;
-    height: 200rpx;
+    width: 240rpx;
+    height: 240rpx;
     margin-bottom: 32rpx;
-    opacity: 0.6;
+    opacity: 0.8;
   }
 
   .empty-text {
-    font-size: 32rpx;
-    color: #666;
-    margin-bottom: 12rpx;
+    font-size: $font-size-lg;
+    color: $text-secondary;
+    margin-bottom: 16rpx;
+    font-weight: 600;
   }
 
   .empty-tips {
-    font-size: 26rpx;
-    color: #999;
+    font-size: $font-size-sm;
+    color: $text-placeholder;
   }
 }
 
 .room-card {
   display: flex;
-  background: #fff;
-  border-radius: 24rpx;
+  background: $bg-white;
+  border-radius: $radius-md;
   padding: 24rpx;
   margin-bottom: 24rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
-  transition: transform 0.2s ease;
-
+  box-shadow: $shadow-sm;
+  transition: all 0.2s ease;
+  
   &:active {
     transform: scale(0.98);
+    box-shadow: none;
   }
 
   .room-image {
-    width: 160rpx;
-    height: 160rpx;
-    border-radius: 16rpx;
+    width: 180rpx;
+    height: 180rpx;
+    border-radius: $radius-sm;
     flex-shrink: 0;
-    background: #f0f0f0;
+    background: $bg-color;
   }
 
   .room-info {
@@ -340,86 +381,97 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    padding: 4rpx 0;
 
     .room-header {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
 
       .room-number {
-        font-size: 34rpx;
-        font-weight: 600;
-        color: #1f2937;
+        font-size: $font-size-lg;
+        font-weight: 700;
+        color: $text-main;
       }
 
       .status-tag {
-        font-size: 22rpx;
+        font-size: $font-size-xs;
         padding: 6rpx 16rpx;
-        border-radius: 20rpx;
+        border-radius: $radius-full;
+        font-weight: 500;
 
         &.pending {
-          background: #FEF3C7;
-          color: #D97706;
+          background: rgba($warning-color, 0.1);
+          color: $warning-color;
         }
 
         &.overdue {
-          background: #FEE2E2;
-          color: #DC2626;
+          background: rgba($error-color, 0.1);
+          color: $error-color;
         }
 
         &.paid {
-          background: #D1FAE5;
-          color: #059669;
+          background: rgba($success-color, 0.1);
+          color: $success-color;
         }
       }
     }
 
     .tenant-name {
-      font-size: 26rpx;
-      color: #6b7280;
+      font-size: $font-size-sm;
+      color: $text-secondary;
+      margin-top: 8rpx;
     }
 
     .rent-info {
       display: flex;
-      align-items: baseline;
+      align-items: flex-end;
       justify-content: space-between;
 
       .amount {
-        font-size: 36rpx;
+        font-size: 40rpx;
         font-weight: 700;
-        color: #3B82F6;
+        color: $primary-color;
+        
+        &::before {
+          content: '¥';
+          font-size: $font-size-sm;
+          margin-right: 4rpx;
+          font-weight: 500;
+        }
       }
 
       .due-date {
-        font-size: 24rpx;
-        color: #9ca3af;
+        font-size: $font-size-xs;
+        color: $text-placeholder;
+        margin-bottom: 8rpx;
       }
     }
   }
 }
 
 .building-popup {
-  background: #fff;
-  border-radius: 32rpx 32rpx 0 0;
+  background: $bg-white;
+  border-radius: $radius-lg $radius-lg 0 0;
   max-height: 70vh;
 
   .popup-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 32rpx;
-    border-bottom: 1rpx solid #f0f0f0;
+    padding: 32rpx 40rpx;
+    border-bottom: 1rpx solid $border-color;
 
     .popup-title {
-      font-size: 32rpx;
-      font-weight: 600;
-      color: #1f2937;
+      font-size: $font-size-lg;
+      font-weight: 700;
+      color: $text-main;
     }
 
     .popup-close {
-      font-size: 48rpx;
-      color: #9ca3af;
-      line-height: 1;
+      font-size: 44rpx;
+      color: $text-placeholder;
+      padding: 10rpx;
     }
   }
 
@@ -430,47 +482,82 @@ export default {
     .building-item {
       display: flex;
       align-items: center;
-      padding: 28rpx 32rpx;
+      padding: 32rpx 40rpx;
       transition: background 0.2s;
 
       &:active {
-        background: #f5f5f5;
+        background: $bg-color;
       }
 
       &.active {
-        background: #EFF6FF;
+        background: rgba($primary-color, 0.05);
 
         .building-item-name {
-          color: #3B82F6;
+          color: $primary-color;
           font-weight: 600;
         }
       }
 
       .building-item-name {
         flex: 1;
-        font-size: 30rpx;
-        color: #1f2937;
+        font-size: $font-size-base;
+        color: $text-main;
       }
 
       .building-room-count {
-        font-size: 24rpx;
-        color: #9ca3af;
+        font-size: $font-size-sm;
+        color: $text-secondary;
         margin-right: 16rpx;
+        background: $bg-color;
+        padding: 4rpx 12rpx;
+        border-radius: $radius-sm;
       }
 
       .check-icon {
-        color: #3B82F6;
-        font-size: 32rpx;
+        color: $primary-color;
         font-weight: bold;
       }
     }
   }
 }
 
+.floating-btn {
+  position: fixed;
+  right: 40rpx;
+  bottom: calc(140rpx + env(safe-area-inset-bottom));
+  width: 110rpx;
+  height: 110rpx;
+  background: $primary-gradient;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: $shadow-float;
+  z-index: 100;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  
+  &:active {
+    transform: scale(0.9) translateY(4rpx);
+  }
+  
+  .floating-icon {
+    font-size: 36rpx;
+    margin-bottom: 4rpx;
+  }
+  
+  .floating-text {
+    font-size: 20rpx;
+    color: #fff;
+    font-weight: 600;
+  }
+}
+
 .loading {
   display: flex;
   justify-content: center;
-  padding: 32rpx;
-  color: #666;
+  padding: 40rpx;
+  color: $text-placeholder;
+  font-size: $font-size-sm;
 }
 </style>

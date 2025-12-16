@@ -5,7 +5,7 @@
       <view class="user-info" v-if="isLoggedIn">
         <image 
           class="avatar" 
-          :src="userInfo.avatar || '/static/images/avatar-default.png'" 
+          :src="userInfo?.avatar || '/static/images/avatar-default.svg'" 
           mode="aspectFill"
         />
         <view class="user-detail">
@@ -14,7 +14,7 @@
         </view>
       </view>
       <view class="login-prompt" v-else @click="goToLogin">
-        <image class="avatar" src="/static/images/avatar-default.png" mode="aspectFill" />
+        <image class="avatar" src="/static/images/avatar-default.svg" mode="aspectFill" />
         <view class="user-detail">
           <text class="nickname">点击登录</text>
           <text class="phone">登录后享受完整功能</text>
@@ -72,17 +72,14 @@
       <view class="menu-item" @click="goToRoomManage" v-if="isLoggedIn">
         <text class="menu-icon">🏠</text>
         <text class="menu-text">房间管理</text>
-        <text class="menu-arrow">›</text>
       </view>
       <view class="menu-item" @click="generateRent" v-if="isLoggedIn">
         <text class="menu-icon">📝</text>
         <text class="menu-text">生成本月租金</text>
-        <text class="menu-arrow">›</text>
       </view>
       <view class="menu-item" @click="showAbout">
         <text class="menu-icon">ℹ️</text>
         <text class="menu-text">关于我们</text>
-        <text class="menu-arrow">›</text>
       </view>
     </view>
 
@@ -192,7 +189,16 @@ export default {
     }
     
     const goToRoomManage = () => {
-      uni.showToast({ title: '功能开发中', icon: 'none' })
+      console.log('Navigating to room manage, buildingId:', currentBuildingId.value)
+      if (!currentBuildingId.value) {
+        uni.showToast({ title: '请先添加或选择楼栋', icon: 'none' })
+        return
+      }
+      
+      const name = currentBuilding.value?.name || '房间管理'
+      uni.navigateTo({ 
+        url: `/pages/room-manage/index?buildingId=${currentBuildingId.value}&buildingName=${name}` 
+      })
     }
     
     const showAbout = () => {
@@ -253,13 +259,15 @@ export default {
 <style lang="scss" scoped>
 .page {
   min-height: 100vh;
-  background: #f5f5f5;
-  padding-bottom: env(safe-area-inset-bottom);
+  background: $bg-color;
+  padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
 }
 
 .user-section {
-  background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
-  padding: 60rpx 32rpx 80rpx;
+  background: $primary-gradient;
+  padding: 60rpx 40rpx 100rpx;
+  border-radius: 0 0 $radius-lg $radius-lg;
+  margin-bottom: 40rpx;
 
   .user-info, .login-prompt {
     display: flex;
@@ -267,52 +275,77 @@ export default {
   }
 
   .avatar {
-    width: 120rpx;
-    height: 120rpx;
-    border-radius: 60rpx;
-    border: 4rpx solid rgba(255, 255, 255, 0.3);
+    width: 140rpx;
+    height: 140rpx;
+    border-radius: $radius-full;
+    border: 6rpx solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
   }
 
   .user-detail {
-    margin-left: 28rpx;
+    margin-left: 32rpx;
     color: #fff;
 
     .nickname {
-      font-size: 36rpx;
-      font-weight: 600;
+      font-size: 40rpx;
+      font-weight: 700;
       display: block;
-      margin-bottom: 8rpx;
+      margin-bottom: 12rpx;
+      text-shadow: 0 2rpx 4rpx rgba(0,0,0,0.1);
     }
 
     .phone {
-      font-size: 26rpx;
-      opacity: 0.85;
+      font-size: $font-size-sm;
+      opacity: 0.9;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 4rpx 16rpx;
+      border-radius: $radius-full;
     }
   }
 }
 
 .section {
-  background: #fff;
-  margin: -40rpx 24rpx 24rpx;
-  border-radius: 24rpx;
-  padding: 28rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+  background: $bg-white;
+  margin: -80rpx 32rpx 32rpx;
+  border-radius: $radius-lg;
+  padding: 32rpx;
+  box-shadow: $shadow-md;
+  position: relative;
+  z-index: 1;
 
   .section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24rpx;
+    margin-bottom: 32rpx;
 
     .section-title {
-      font-size: 32rpx;
-      font-weight: 600;
-      color: #1f2937;
+      font-size: $font-size-lg;
+      font-weight: 700;
+      color: $text-main;
+      position: relative;
+      padding-left: 20rpx;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 8rpx;
+        height: 32rpx;
+        background: $primary-color;
+        border-radius: $radius-full;
+      }
     }
 
     .section-action {
-      font-size: 26rpx;
-      color: #3B82F6;
+      font-size: $font-size-sm;
+      color: $primary-color;
+      font-weight: 500;
+      background: rgba($primary-color, 0.1);
+      padding: 6rpx 20rpx;
+      border-radius: $radius-full;
     }
   }
 }
@@ -321,17 +354,25 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20rpx;
-  background: #EFF6FF;
-  border-radius: 16rpx;
+  padding: 24rpx;
+  background: $bg-color;
+  border-radius: $radius-md;
+  border: 1rpx solid $border-color;
 
   .building-info {
     display: flex;
     align-items: center;
 
     .building-icon {
-      font-size: 40rpx;
-      margin-right: 16rpx;
+      font-size: 48rpx;
+      margin-right: 20rpx;
+      background: #fff;
+      width: 80rpx;
+      height: 80rpx;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: $radius-sm;
     }
 
     .building-detail {
@@ -339,34 +380,41 @@ export default {
       flex-direction: column;
 
       .building-name {
-        font-size: 30rpx;
-        font-weight: 600;
-        color: #1f2937;
+        font-size: $font-size-base;
+        font-weight: 700;
+        color: $text-main;
+        margin-bottom: 4rpx;
       }
 
       .building-address {
-        font-size: 24rpx;
-        color: #6b7280;
-        margin-top: 4rpx;
+        font-size: $font-size-xs;
+        color: $text-secondary;
       }
     }
   }
 
   .room-count {
-    font-size: 26rpx;
-    color: #3B82F6;
-    font-weight: 500;
+    font-size: $font-size-xs;
+    color: $primary-color;
+    font-weight: 600;
+    background: #fff;
+    padding: 6rpx 16rpx;
+    border-radius: $radius-full;
+    box-shadow: $shadow-sm;
   }
 }
 
 .building-switch-list {
-  margin-top: 24rpx;
+  margin-top: 32rpx;
+  border-top: 1rpx solid $border-color;
+  padding-top: 24rpx;
 
   .switch-title {
-    font-size: 26rpx;
-    color: #6b7280;
-    margin-bottom: 16rpx;
+    font-size: $font-size-xs;
+    color: $text-placeholder;
+    margin-bottom: 20rpx;
     display: block;
+    font-weight: 500;
   }
 
   .switch-item {
@@ -374,15 +422,11 @@ export default {
     align-items: center;
     justify-content: space-between;
     padding: 20rpx 0;
-    border-bottom: 1rpx solid #f3f4f6;
-
-    &:last-child {
-      border-bottom: none;
-    }
-
+    
     .switch-name {
-      font-size: 28rpx;
-      color: #1f2937;
+      font-size: $font-size-base;
+      color: $text-main;
+      font-weight: 500;
     }
   }
 }
@@ -392,8 +436,8 @@ export default {
   padding: 40rpx 0;
 
   .empty-text {
-    font-size: 28rpx;
-    color: #9ca3af;
+    font-size: $font-size-sm;
+    color: $text-secondary;
     margin-bottom: 24rpx;
     display: block;
   }
@@ -401,66 +445,70 @@ export default {
   .add-btn {
     display: inline-block;
     padding: 16rpx 48rpx;
-    background: #3B82F6;
+    background: $primary-color;
     color: #fff;
-    font-size: 28rpx;
-    border-radius: 40rpx;
+    font-size: $font-size-sm;
+    border-radius: $radius-full;
     border: none;
+    box-shadow: $shadow-float;
   }
 }
 
 .menu-section {
-  background: #fff;
-  margin: 24rpx;
-  border-radius: 24rpx;
-  overflow: hidden;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24rpx;
+  padding: 0 32rpx;
+  margin-bottom: 40rpx;
 
   .menu-item {
+    background: $bg-white;
+    border-radius: $radius-md;
+    padding: 32rpx 0;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    padding: 32rpx 28rpx;
-    border-bottom: 1rpx solid #f3f4f6;
-
-    &:last-child {
-      border-bottom: none;
-    }
-
+    justify-content: center;
+    box-shadow: $shadow-sm;
+    transition: all 0.2s;
+    
     &:active {
-      background: #f9fafb;
+      transform: scale(0.96);
+      box-shadow: none;
     }
 
     .menu-icon {
-      font-size: 36rpx;
-      margin-right: 20rpx;
+      font-size: 56rpx;
+      margin-bottom: 16rpx;
     }
 
     .menu-text {
-      flex: 1;
-      font-size: 30rpx;
-      color: #1f2937;
-    }
-
-    .menu-arrow {
-      font-size: 36rpx;
-      color: #d1d5db;
+      font-size: $font-size-sm;
+      color: $text-main;
+      font-weight: 500;
     }
   }
 }
 
 .logout-section {
-  padding: 48rpx 24rpx;
+  padding: 0 48rpx;
 
   .logout-btn {
     width: 100%;
-    height: 88rpx;
-    background: #fff;
-    color: #EF4444;
-    font-size: 30rpx;
-    border: 1rpx solid #EF4444;
-    border-radius: 44rpx;
+    height: 96rpx;
+    background: rgba($error-color, 0.05);
+    color: $error-color;
+    font-size: $font-size-base;
+    font-weight: 600;
+    border-radius: $radius-full;
     display: flex;
     align-items: center;
     justify-content: center;
+    border: none;
+    
+    &:active {
+      background: rgba($error-color, 0.1);
+    }
   }
 }
 </style>

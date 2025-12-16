@@ -125,7 +125,32 @@ export default {
     const showAddModal = () => {
       isEdit.value = false
       editingId.value = ''
-      formData.value = { roomNumber: '', monthlyRent: '', area: '' }
+      
+      // 智能填充：获取最后一个房间的信息
+      let defaultData = { roomNumber: '', monthlyRent: '', area: '' }
+      
+      if (rooms.value.length > 0) {
+        // 尝试按房间号排序找到最后一个（假设是数字）
+        const sortedRooms = [...rooms.value].sort((a, b) => {
+          const numA = parseInt(a.roomNumber) || 0
+          const numB = parseInt(b.roomNumber) || 0
+          return numA - numB
+        })
+        
+        const lastRoom = sortedRooms[sortedRooms.length - 1]
+        
+        // 复用租金和面积
+        defaultData.monthlyRent = lastRoom.monthlyRent
+        defaultData.area = lastRoom.area
+        
+        // 尝试预测下一个房间号
+        const lastNum = parseInt(lastRoom.roomNumber)
+        if (!isNaN(lastNum)) {
+          defaultData.roomNumber = String(lastNum + 1)
+        }
+      }
+      
+      formData.value = defaultData
       formPopup.value.open()
     }
     
@@ -232,8 +257,9 @@ export default {
 <style lang="scss" scoped>
 .page {
   min-height: 100vh;
-  background: #f5f5f5;
-  padding: 24rpx;
+  background: $bg-color;
+  padding: 32rpx;
+  padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
 }
 
 .room-grid {
@@ -243,114 +269,142 @@ export default {
 }
 
 .room-card {
-  background: #fff;
-  border-radius: 16rpx;
+  background: $bg-white;
+  border-radius: $radius-md;
   padding: 24rpx;
-  min-height: 180rpx;
+  min-height: 200rpx;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
+  box-shadow: $shadow-sm;
+  transition: all 0.2s;
+  border: 2rpx solid transparent;
+  
+  &:active {
+    transform: scale(0.96);
+  }
   
   &.add-card {
     align-items: center;
     justify-content: center;
-    border: 2rpx dashed #d1d5db;
+    border: 2rpx dashed $border-color;
     background: transparent;
+    box-shadow: none;
     
     .add-icon {
-      font-size: 48rpx;
-      color: #9ca3af;
-      margin-bottom: 8rpx;
+      font-size: 56rpx;
+      color: $text-placeholder;
+      margin-bottom: 12rpx;
+      font-weight: 300;
+      transition: color 0.2s;
     }
     
     .add-text {
-      font-size: 26rpx;
-      color: #6b7280;
+      font-size: $font-size-sm;
+      color: $text-secondary;
     }
     
     &:active {
-      background: rgba(0,0,0,0.02);
+      background: rgba($primary-color, 0.02);
+      border-color: rgba($primary-color, 0.3);
+      
+      .add-icon {
+        color: $primary-color;
+      }
     }
   }
   
   .room-number {
-    font-weight: bold;
-    font-size: 32rpx;
-    color: #1f2937;
+    font-weight: 700;
+    font-size: $font-size-lg;
+    color: $text-main;
   }
   
   .room-status {
     align-self: flex-start;
-    font-size: 20rpx;
-    padding: 4rpx 12rpx;
-    border-radius: 8rpx;
-    margin: 12rpx 0;
+    font-size: $font-size-xs;
+    padding: 4rpx 16rpx;
+    border-radius: $radius-full;
+    margin: 16rpx 0;
+    font-weight: 500;
     
     &.rented {
-      background: #ECFDF5;
-      color: #10B981;
+      background: rgba($success-color, 0.1);
+      color: $success-color;
     }
     
     &.empty {
-      background: #F3F4F6;
-      color: #6B7280;
+      background: $bg-color;
+      color: $text-placeholder;
     }
   }
   
   .room-info {
-    font-size: 22rpx;
-    color: #6b7280;
+    font-size: $font-size-xs;
+    color: $text-secondary;
     display: flex;
     flex-direction: column;
     
+    > text:first-child {
+      color: $primary-color;
+      font-weight: 600;
+    }
+    
     .tenant-name {
-      margin-top: 4rpx;
-      color: #3B82F6;
+      margin-top: 6rpx;
+      color: $text-main;
+      font-weight: 500;
     }
   }
 }
 
 .form-popup {
   width: 600rpx;
-  background: #fff;
-  border-radius: 24rpx;
-  padding: 40rpx;
+  background: $bg-white;
+  border-radius: $radius-lg;
+  padding: 48rpx;
   
   .popup-title {
-    font-size: 36rpx;
-    font-weight: 600;
-    color: #1f2937;
+    font-size: $font-size-xl;
+    font-weight: 700;
+    color: $text-main;
     text-align: center;
-    margin-bottom: 40rpx;
+    margin-bottom: 48rpx;
     display: block;
   }
   
   .form-group {
-    margin-bottom: 28rpx;
+    margin-bottom: 32rpx;
     
     .form-label {
-      font-size: 28rpx;
-      color: #374151;
-      margin-bottom: 12rpx;
+      font-size: $font-size-sm;
+      color: $text-main;
+      margin-bottom: 16rpx;
       display: block;
+      font-weight: 500;
     }
     
     .form-input {
       width: 100%;
-      height: 88rpx;
-      background: #f9fafb;
-      border: 2rpx solid #e5e7eb;
-      border-radius: 16rpx;
-      padding: 0 24rpx;
-      font-size: 30rpx;
-      color: #1f2937;
+      height: 96rpx;
+      background: $bg-color;
+      border: 2rpx solid transparent;
+      border-radius: $radius-md;
+      padding: 0 32rpx;
+      font-size: $font-size-base;
+      color: $text-main;
+      transition: all 0.2s;
+      
+      &:focus {
+        background: #fff;
+        border-color: $primary-color;
+      }
     }
   }
   
   .popup-actions {
     display: flex;
-    margin-top: 40rpx;
+    margin-top: 56rpx;
     
     .spacer {
       width: 24rpx;
@@ -358,29 +412,30 @@ export default {
     
     .popup-btn {
       flex: 1;
-      height: 88rpx;
-      border-radius: 44rpx;
-      font-size: 30rpx;
-      font-weight: 500;
+      height: 96rpx;
+      border-radius: $radius-full;
+      font-size: $font-size-base;
+      font-weight: 600;
       display: flex;
       align-items: center;
       justify-content: center;
       border: none;
       
       &.cancel {
-        background: #f3f4f6;
-        color: #6b7280;
+        background: $bg-color;
+        color: $text-secondary;
         margin-right: 24rpx;
       }
       
       &.confirm {
-        background: #3B82F6;
+        background: $primary-color;
         color: #fff;
+        box-shadow: 0 4rpx 16rpx rgba($primary-color, 0.3);
       }
       
       &.delete {
-        background: #FEE2E2;
-        color: #EF4444;
+        background: rgba($error-color, 0.1);
+        color: $error-color;
         flex: 0 0 160rpx;
         margin-right: 24rpx;
       }
