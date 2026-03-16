@@ -1,0 +1,176 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1773661636418,
+  "projectRoot": "/Users/wujiaqiang/Desktop/code/projects/FangDong/f",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "vue",
+        "version": "3.4.21",
+        "category": "frontend"
+      },
+      {
+        "name": "vite",
+        "version": "5.2.8",
+        "category": "build"
+      }
+    ],
+    "packageManager": "pnpm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {
+      "update-config": "node scripts/update-config.js",
+      "dev:mp-weixin": "npm run update-config && uni -p mp-weixin",
+      "build:mp-weixin": "npm run update-config && uni build -p mp-weixin"
+    }
+  },
+  "conventions": {
+    "namingStyle": "camelCase",
+    "importStyle": "ES modules",
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "scripts",
+      "src"
+    ],
+    "gitBranches": {
+      "defaultBranch": "master",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "cloudfunctions": {
+      "path": "cloudfunctions",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1773661636402,
+      "keyFiles": []
+    },
+    "dist": {
+      "path": "dist",
+      "purpose": "Distribution/build output",
+      "fileCount": 0,
+      "lastAccessed": 1773661636405,
+      "keyFiles": []
+    },
+    "scripts": {
+      "path": "scripts",
+      "purpose": "Build/utility scripts",
+      "fileCount": 1,
+      "lastAccessed": 1773661636405,
+      "keyFiles": [
+        "update-config.js"
+      ]
+    },
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 5,
+      "lastAccessed": 1773661636405,
+      "keyFiles": [
+        "App.vue",
+        "main.js",
+        "manifest.json",
+        "pages.json",
+        "uni.scss"
+      ]
+    },
+    "src/pages": {
+      "path": "src/pages",
+      "purpose": "Page components",
+      "fileCount": 0,
+      "lastAccessed": 1773661636406,
+      "keyFiles": []
+    },
+    "src/static": {
+      "path": "src/static",
+      "purpose": "Static files",
+      "fileCount": 0,
+      "lastAccessed": 1773661636406,
+      "keyFiles": []
+    },
+    "src/utils": {
+      "path": "src/utils",
+      "purpose": "Utility functions",
+      "fileCount": 2,
+      "lastAccessed": 1773661636407,
+      "keyFiles": [
+        "cloud.js",
+        "date.js"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "src/pages/index/index.vue",
+      "accessCount": 14,
+      "lastAccessed": 1773667176149,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/room-detail/index.vue",
+      "accessCount": 14,
+      "lastAccessed": 1773667197013,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/mine/index.vue",
+      "accessCount": 13,
+      "lastAccessed": 1773667230338,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/room-manage/index.vue",
+      "accessCount": 9,
+      "lastAccessed": 1773667747652,
+      "type": "file"
+    },
+    {
+      "path": "src/pages/login/index.vue",
+      "accessCount": 8,
+      "lastAccessed": 1773667737277,
+      "type": "file"
+    },
+    {
+      "path": "src/uni.scss",
+      "accessCount": 7,
+      "lastAccessed": 1773666266129,
+      "type": "file"
+    },
+    {
+      "path": "src/App.vue",
+      "accessCount": 1,
+      "lastAccessed": 1773663405168,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

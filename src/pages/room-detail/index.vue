@@ -1,10 +1,10 @@
 <template>
   <view class="page">
-    <!-- 房间基本信息 -->
+    <!-- 房间 Header -->
     <view class="room-header">
-      <image 
-        class="room-image" 
-        :src="room.roomImage || '/static/images/room-default.svg'" 
+      <image
+        class="room-image"
+        :src="room.roomImage || '/static/images/room-default.svg'"
         mode="aspectFill"
       />
       <view class="room-overlay">
@@ -15,83 +15,27 @@
       </view>
     </view>
 
-    <!-- 信息卡片 -->
+    <!-- 信息区 -->
     <view class="info-section">
-      <!-- 租客信息 -->
-      <view class="info-card">
-        <view class="card-title">
-          <text class="title-icon">👤</text>
-          <text>租客信息</text>
-        </view>
-        <view class="card-content" v-if="room.tenant?.name">
-          <view class="info-row">
-            <text class="label">姓名</text>
-            <text class="value">{{ room.tenant.name }}</text>
+      <!-- 待缴费卡片 -->
+      <view class="pay-card" v-if="currentRecord">
+        <view class="pay-top">
+          <view class="pay-label-row">
+            <view class="pay-dot"></view>
+            <text class="pay-label">本期租金</text>
           </view>
-          <view class="info-row">
-            <text class="label">电话</text>
-            <text class="value phone" @click="callTenant">{{ room.tenant.phone || '未填写' }}</text>
-          </view>
-          <view class="info-row">
-            <text class="label">身份证</text>
-            <text class="value">{{ maskIdCard(room.tenant.idCard) }}</text>
+          <view :class="['pay-status-badge', currentRecord.status]">
+            {{ getStatusText(currentRecord.status) }}
           </view>
         </view>
-        <view class="card-content empty" v-else>
-          <text class="empty-text">暂无租客</text>
+        <view class="pay-amount-row">
+          <text class="pay-symbol">¥</text>
+          <text class="pay-amount">{{ currentRecord.amount }}</text>
         </view>
-      </view>
-
-      <!-- 租约信息 -->
-      <view class="info-card">
-        <view class="card-title">
-          <text class="title-icon">📄</text>
-          <text>租约信息</text>
-        </view>
-        <view class="card-content" v-if="room.leaseInfo?.startDate">
-          <view class="info-row">
-            <text class="label">月租金</text>
-            <text class="value highlight">¥{{ room.monthlyRent }}</text>
-          </view>
-          <view class="info-row">
-            <text class="label">押金</text>
-            <text class="value">¥{{ room.leaseInfo.deposit || 0 }}</text>
-          </view>
-          <view class="info-row">
-            <text class="label">租期</text>
-            <text class="value">{{ formatDateRange(room.leaseInfo.startDate, room.leaseInfo.endDate) }}</text>
-          </view>
-          <view class="info-row">
-            <text class="label">缴费日</text>
-            <text class="value">每月{{ room.leaseInfo.payDay }}日</text>
-          </view>
-        </view>
-        <view class="card-content empty" v-else>
-          <text class="empty-text">暂无租约信息</text>
-        </view>
-      </view>
-
-      <!-- 待缴费信息 -->
-      <view class="info-card highlight-card" v-if="currentRecord">
-        <view class="card-title">
-          <text class="title-icon">💰</text>
-          <text>待缴费</text>
-        </view>
-        <view class="card-content">
-          <view class="amount-display">
-            <text class="currency">¥</text>
-            <text class="amount">{{ currentRecord.amount }}</text>
-          </view>
-          <view class="due-info">
-            <text :class="['due-status', currentRecord.status]">
-              {{ getStatusText(currentRecord.status) }}
-            </text>
-            <text class="due-date">截止日期：{{ formatDate(currentRecord.dueDate) }}</text>
-          </view>
-        </view>
-        <button 
-          class="pay-btn" 
-          :class="{ disabled: currentRecord.status === 'paid' }"
+        <text class="pay-due-text">截止日期：{{ formatDate(currentRecord.dueDate) }}</text>
+        <button
+          class="pay-btn"
+          :class="{ paid: currentRecord.status === 'paid' }"
           @click="markAsPaid"
           :disabled="currentRecord.status === 'paid'"
         >
@@ -99,15 +43,65 @@
         </button>
       </view>
 
+      <!-- 租客信息 -->
+      <view class="info-card">
+        <view class="card-title-row">
+          <uni-icons type="contact" size="18" color="#1890FF"/>
+          <text class="card-title">租客信息</text>
+        </view>
+        <view v-if="room.tenant?.name">
+          <view class="info-row">
+            <text class="row-label">姓名</text>
+            <text class="row-val">{{ room.tenant.name }}</text>
+          </view>
+          <view class="info-row">
+            <text class="row-label">电话</text>
+            <text class="row-val phone-link" @click="callTenant">{{ room.tenant.phone || '未填写' }}</text>
+          </view>
+          <view class="info-row last">
+            <text class="row-label">身份证</text>
+            <text class="row-val">{{ maskIdCard(room.tenant.idCard) }}</text>
+          </view>
+        </view>
+        <view v-else class="card-empty"><text>暂无租客</text></view>
+      </view>
+
+      <!-- 租约信息 -->
+      <view class="info-card">
+        <view class="card-title-row">
+          <uni-icons type="list" size="18" color="#1890FF"/>
+          <text class="card-title">租约信息</text>
+        </view>
+        <view v-if="room.leaseInfo?.startDate">
+          <view class="info-row">
+            <text class="row-label">月租金</text>
+            <text class="row-val highlight">¥{{ room.monthlyRent }}</text>
+          </view>
+          <view class="info-row">
+            <text class="row-label">押金</text>
+            <text class="row-val">¥{{ room.leaseInfo.deposit || 0 }}</text>
+          </view>
+          <view class="info-row">
+            <text class="row-label">租期</text>
+            <text class="row-val">{{ formatDateRange(room.leaseInfo.startDate, room.leaseInfo.endDate) }}</text>
+          </view>
+          <view class="info-row last">
+            <text class="row-label">缴费日</text>
+            <text class="row-val">每月{{ room.leaseInfo.payDay }}日</text>
+          </view>
+        </view>
+        <view v-else class="card-empty"><text>暂无租约信息</text></view>
+      </view>
+
       <!-- 缴费历史 -->
       <view class="info-card">
-        <view class="card-title">
-          <text class="title-icon">📋</text>
-          <text>缴费历史</text>
+        <view class="card-title-row">
+          <uni-icons type="calendar" size="18" color="#1890FF"/>
+          <text class="card-title">缴费历史</text>
         </view>
-        <view class="card-content" v-if="rentRecords.length > 0">
-          <view 
-            v-for="record in rentRecords" 
+        <view v-if="rentRecords.length > 0">
+          <view
+            v-for="record in rentRecords"
             :key="record._id"
             class="history-item"
           >
@@ -120,9 +114,7 @@
             </view>
           </view>
         </view>
-        <view class="card-content empty" v-else>
-          <text class="empty-text">暂无缴费记录</text>
-        </view>
+        <view v-else class="card-empty"><text>暂无缴费记录</text></view>
       </view>
     </view>
   </view>
@@ -139,14 +131,14 @@ export default {
     const rentRecords = ref([])
     const currentRecord = ref(null)
     const recordId = ref('')
-    
+
     // 获取页面参数
     const getPageParams = () => {
       const pages = getCurrentPages()
       const currentPage = pages[pages.length - 1]
       return currentPage.options || {}
     }
-    
+
     // 获取房间详情
     const fetchRoomDetail = async (roomId) => {
       try {
@@ -154,11 +146,11 @@ export default {
           action: 'getRoomDetail',
           roomId
         })
-        
+
         if (result) {
           room.value = result.room || {}
           rentRecords.value = result.rentRecords || []
-          
+
           // 找到当前待缴费记录
           if (recordId.value) {
             currentRecord.value = rentRecords.value.find(r => r._id === recordId.value)
@@ -169,11 +161,11 @@ export default {
         uni.showToast({ title: '获取详情失败', icon: 'none' })
       }
     }
-    
+
     // 标记已缴费
     const markAsPaid = async () => {
       if (!currentRecord.value || currentRecord.value.status === 'paid') return
-      
+
       uni.showModal({
         title: '确认操作',
         content: '确定标记该笔租金为已缴费？',
@@ -184,15 +176,15 @@ export default {
                 action: 'markPaid',
                 recordId: currentRecord.value._id
               })
-              
+
               currentRecord.value.status = 'paid'
-              
+
               // 更新列表中的状态
               const idx = rentRecords.value.findIndex(r => r._id === currentRecord.value._id)
               if (idx !== -1) {
                 rentRecords.value[idx].status = 'paid'
               }
-              
+
               uni.showToast({ title: '操作成功', icon: 'success' })
             } catch (error) {
               console.error('标记失败:', error)
@@ -201,36 +193,36 @@ export default {
         }
       })
     }
-    
+
     // 拨打电话
     const callTenant = () => {
       const phone = room.value.tenant?.phone
       if (!phone) return
-      
+
       uni.makePhoneCall({
         phoneNumber: phone,
         fail: () => {}
       })
     }
-    
+
     // 格式化日期范围
     const formatDateRange = (start, end) => {
       if (!start || !end) return '未设置'
       return `${formatDateUtil(start, 'YYYY.MM.DD')} - ${formatDateUtil(end, 'YYYY.MM.DD')}`
     }
-    
+
     // 格式化日期
     const formatDate = (date) => {
       return formatDateUtil(date, 'YYYY-MM-DD')
     }
-    
+
     // 脱敏身份证号
     const maskIdCard = (idCard) => {
       if (!idCard) return '未填写'
       if (idCard.length < 8) return idCard
       return idCard.slice(0, 4) + '****' + idCard.slice(-4)
     }
-    
+
     // 获取状态文本
     const getStatusText = (status) => {
       const statusMap = {
@@ -240,7 +232,7 @@ export default {
       }
       return statusMap[status] || status
     }
-    
+
     onMounted(() => {
       const params = getPageParams()
       if (params.roomId) {
@@ -248,7 +240,7 @@ export default {
         fetchRoomDetail(params.roomId)
       }
     })
-    
+
     return {
       room,
       rentRecords,
@@ -267,7 +259,7 @@ export default {
 <style lang="scss" scoped>
 .page {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: $bg-color;
 }
 
 .room-header {
@@ -285,29 +277,30 @@ export default {
     left: 0;
     right: 0;
     padding: 32rpx;
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.55));
     display: flex;
     align-items: center;
     justify-content: space-between;
 
     .room-number {
-      font-size: 48rpx;
-      font-weight: 700;
+      font-size: 52rpx;
+      font-weight: 800;
       color: #fff;
     }
 
     .status-badge {
       font-size: 24rpx;
-      padding: 8rpx 20rpx;
-      border-radius: 20rpx;
+      padding: 10rpx 24rpx;
+      border-radius: $radius-full;
+      font-weight: 600;
 
       &.rented {
-        background: rgba(16, 185, 129, 0.9);
+        background: rgba(82, 196, 26, 0.85);
         color: #fff;
       }
 
       &.empty {
-        background: rgba(156, 163, 175, 0.9);
+        background: rgba(255, 255, 255, 0.25);
         color: #fff;
       }
     }
@@ -315,159 +308,169 @@ export default {
 }
 
 .info-section {
-  padding: 24rpx;
-  margin-top: -40rpx;
+  padding: 24rpx 32rpx;
+  margin-top: -20rpx;
   position: relative;
 }
 
-.info-card {
-  background: #fff;
-  border-radius: 24rpx;
-  padding: 28rpx;
+.pay-card {
+  background: $primary-gradient;
+  border-radius: $radius-lg;
+  padding: 32rpx;
   margin-bottom: 24rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05);
+  box-shadow: $shadow-float;
 
-  &.highlight-card {
-    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
-
-    .card-title {
-      color: #fff;
-    }
-
-    .card-content {
-      color: #fff;
-    }
-  }
-
-  .card-title {
+  .pay-top {
     display: flex;
     align-items: center;
-    font-size: 30rpx;
-    font-weight: 600;
-    color: #1f2937;
-    margin-bottom: 24rpx;
-
-    .title-icon {
-      margin-right: 12rpx;
-    }
-  }
-
-  .card-content {
-    &.empty {
-      padding: 32rpx 0;
-      text-align: center;
-
-      .empty-text {
-        color: #9ca3af;
-        font-size: 28rpx;
-      }
-    }
-  }
-
-  .info-row {
-    display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 16rpx 0;
-    border-bottom: 1rpx solid #f3f4f6;
+    margin-bottom: 16rpx;
 
-    &:last-child {
-      border-bottom: none;
-    }
+    .pay-label-row {
+      display: flex;
+      align-items: center;
+      gap: 10rpx;
 
-    .label {
-      font-size: 28rpx;
-      color: #6b7280;
-    }
-
-    .value {
-      font-size: 28rpx;
-      color: #1f2937;
-
-      &.highlight {
-        color: #3B82F6;
-        font-weight: 600;
-        font-size: 32rpx;
+      .pay-dot {
+        width: 10rpx;
+        height: 10rpx;
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 50%;
       }
 
-      &.phone {
-        color: #3B82F6;
+      .pay-label {
+        font-size: $font-size-sm;
+        color: rgba(255, 255, 255, 0.85);
+      }
+    }
+
+    .pay-status-badge {
+      font-size: $font-size-xs;
+      padding: 6rpx 20rpx;
+      border-radius: $radius-full;
+
+      &.pending {
+        background: rgba(255, 255, 255, 0.2);
+        color: #fff;
+      }
+
+      &.overdue {
+        background: rgba(255, 77, 79, 0.2);
+        color: #FFCCC7;
+      }
+
+      &.paid {
+        background: rgba(255, 255, 255, 0.2);
+        color: #fff;
       }
     }
   }
-}
 
-.amount-display {
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  padding: 24rpx 0;
+  .pay-amount-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8rpx;
+    margin-bottom: 10rpx;
 
-  .currency {
-    font-size: 36rpx;
-    font-weight: 500;
-  }
-
-  .amount {
-    font-size: 72rpx;
-    font-weight: 700;
-    margin-left: 8rpx;
-  }
-}
-
-.due-info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12rpx;
-
-  .due-status {
-    font-size: 26rpx;
-    padding: 8rpx 24rpx;
-    border-radius: 20rpx;
-
-    &.pending {
-      background: rgba(255, 255, 255, 0.2);
+    .pay-symbol {
+      font-size: $font-size-xl;
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 500;
     }
 
-    &.overdue {
-      background: #FEE2E2;
-      color: #DC2626;
+    .pay-amount {
+      font-size: 80rpx;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1;
     }
+  }
+
+  .pay-due-text {
+    font-size: $font-size-xs;
+    color: rgba(255, 255, 255, 0.7);
+    display: block;
+    margin-bottom: 28rpx;
+  }
+
+  .pay-btn {
+    width: 100%;
+    height: 96rpx;
+    background: rgba(255, 255, 255, 0.22);
+    border: 1rpx solid rgba(255, 255, 255, 0.5);
+    border-radius: $radius-full;
+    color: #fff;
+    font-size: $font-size-base;
+    font-weight: 600;
+    letter-spacing: 2rpx;
+
+    &:active { background: rgba(255, 255, 255, 0.3); }
 
     &.paid {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: rgba(255, 255, 255, 0.5);
     }
-  }
-
-  .due-date {
-    font-size: 24rpx;
-    opacity: 0.85;
   }
 }
 
-.pay-btn {
-  width: 100%;
-  height: 88rpx;
-  background: rgba(255, 255, 255, 0.2);
-  border: 2rpx solid rgba(255, 255, 255, 0.5);
-  border-radius: 44rpx;
-  color: #fff;
-  font-size: 30rpx;
-  font-weight: 600;
-  margin-top: 24rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.info-card {
+  background: $bg-card;
+  border-radius: $radius-lg;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  box-shadow: $shadow-sm;
 
-  &:active {
-    background: rgba(255, 255, 255, 0.3);
+  .card-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12rpx;
+    margin-bottom: 24rpx;
+
+    .card-title {
+      font-size: $font-size-base;
+      font-weight: 700;
+      color: $text-main;
+    }
   }
 
-  &.disabled {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
-    color: rgba(255, 255, 255, 0.5);
+  .card-empty {
+    padding: 28rpx 0;
+    text-align: center;
+
+    text {
+      font-size: $font-size-sm;
+      color: $text-placeholder;
+    }
+  }
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid $border-color;
+
+  &.last { border-bottom: none; }
+
+  .row-label {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+  }
+
+  .row-val {
+    font-size: $font-size-sm;
+    color: $text-main;
+    font-weight: 500;
+
+    &.highlight {
+      color: $warning-color;
+      font-weight: 700;
+      font-size: $font-size-lg;
+    }
+
+    &.phone-link { color: $primary-color; }
   }
 }
 
@@ -475,48 +478,35 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20rpx 0;
-  border-bottom: 1rpx solid #f3f4f6;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid $border-color;
 
-  &:last-child {
-    border-bottom: none;
-  }
+  &:last-child { border-bottom: none; }
 
   .history-left {
     display: flex;
     flex-direction: column;
-    gap: 8rpx;
+    gap: 6rpx;
 
     .history-date {
-      font-size: 28rpx;
-      color: #1f2937;
+      font-size: $font-size-base;
+      color: $text-main;
     }
 
     .history-amount {
-      font-size: 26rpx;
-      color: #6b7280;
+      font-size: $font-size-xs;
+      color: $text-secondary;
     }
   }
 
   .history-status {
-    font-size: 24rpx;
-    padding: 8rpx 20rpx;
-    border-radius: 16rpx;
+    font-size: $font-size-xs;
+    padding: 6rpx 20rpx;
+    border-radius: $radius-full;
 
-    &.pending {
-      background: #FEF3C7;
-      color: #D97706;
-    }
-
-    &.overdue {
-      background: #FEE2E2;
-      color: #DC2626;
-    }
-
-    &.paid {
-      background: #D1FAE5;
-      color: #059669;
-    }
+    &.pending { background: #FFF7E6; color: $warning-color; }
+    &.overdue { background: #FFF1F0; color: $error-color; }
+    &.paid { background: #F6FFED; color: $success-color; }
   }
 }
 </style>

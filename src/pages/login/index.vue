@@ -1,92 +1,59 @@
 <template>
   <view class="page">
+    <!-- 顶部装饰波浪 -->
+    <view class="top-wave">
+      <view class="wave-circle c1"></view>
+      <view class="wave-circle c2"></view>
+      <view class="wave-circle c3"></view>
+    </view>
+
     <view class="login-container">
       <!-- Logo -->
       <view class="logo-section">
-        <text class="logo-icon">🏠</text>
+        <view class="logo-icon-wrap">
+          <uni-icons type="home" size="44" color="#1890FF" />
+        </view>
         <text class="logo-title">房东助手</text>
         <text class="logo-subtitle">让租房管理更简单</text>
       </view>
 
-      <!-- 登录方式选择 -->
-      <view class="login-methods">
-        <!-- 微信一键登录 -->
-        <button
-          class="login-btn wechat-btn"
-          open-type="getUserInfo"
-          @click="handleWxLogin"
-        >
-          <text class="btn-icon">💬</text>
+      <!-- 登录方式 -->
+      <view class="login-card">
+        <button class="login-btn wechat-btn" open-type="getUserInfo" @click="handleWxLogin">
+          <uni-icons class="btn-icon" type="chat" size="20" color="#fff" />
           <text>微信一键登录</text>
         </button>
 
-        <!-- 获取手机号登录 -->
-        <button
-          class="login-btn phone-btn"
-          open-type="getPhoneNumber"
-          @getphonenumber="handleGetPhoneNumber"
-        >
-          <text class="btn-icon">📱</text>
+        <button class="login-btn phone-quick-btn" open-type="getPhoneNumber" @getphonenumber="handleGetPhoneNumber">
+          <uni-icons class="btn-icon" type="phone" size="20" color="#1890FF" />
           <text>手机号快捷登录</text>
         </button>
 
-        <!-- 分割线 -->
         <view class="divider">
           <view class="divider-line"></view>
-          <text class="divider-text">或</text>
+          <text class="divider-text">验证码登录</text>
           <view class="divider-line"></view>
         </view>
 
-        <!-- 手机号验证码登录 -->
         <view class="phone-login-form">
           <view class="input-group">
             <text class="input-prefix">+86</text>
-            <input
-              class="input"
-              type="number"
-              v-model="phone"
-              placeholder="请输入手机号"
-              maxlength="11"
-            />
+            <input class="input" type="number" v-model="phone" placeholder="请输入手机号" maxlength="11" />
           </view>
-
           <view class="input-group">
-            <input
-              class="input code-input"
-              type="number"
-              v-model="smsCode"
-              placeholder="请输入验证码"
-              maxlength="6"
-            />
-            <button
-              class="send-code-btn"
-              :class="{ disabled: countdown > 0 }"
-              :disabled="countdown > 0"
-              @click="sendCode"
-            >
-              {{ countdown > 0 ? `${countdown}s` : "获取验证码" }}
+            <input class="input code-input" type="number" v-model="smsCode" placeholder="请输入验证码" maxlength="6" />
+            <button class="send-code-btn" :class="{ disabled: countdown > 0 }" :disabled="countdown > 0" @click="sendCode">
+              {{ countdown > 0 ? `${countdown}s` : '获取验证码' }}
             </button>
           </view>
-
-          <button
-            class="login-btn submit-btn"
-            :class="{ disabled: !canSubmit }"
-            :disabled="!canSubmit"
-            @click="handlePhoneLogin"
-          >
-            登录
+          <button class="login-btn submit-btn" :class="{ disabled: !canSubmit }" :disabled="!canSubmit" @click="handlePhoneLogin">
+            登 录
           </button>
         </view>
       </view>
 
-      <!-- 协议 -->
       <view class="agreement">
-        <text class="agreement-text">
-          登录即表示同意
-          <text class="link">《用户协议》</text>
-          和
-          <text class="link">《隐私政策》</text>
-        </text>
+        <text class="agreement-text">登录即表示同意<text class="link">《用户协议》</text>和<text class="link">《隐私政策》</text></text>
       </view>
     </view>
   </view>
@@ -293,74 +260,136 @@ export default {
 <style lang="scss" scoped>
 .page {
   min-height: 100vh;
-  background: linear-gradient(180deg, #eff6ff 0%, #fff 50%);
+  background: $bg-color;
+  overflow: hidden;
+}
+
+.top-wave {
+  position: absolute;
+  top: -200rpx;
+  left: -100rpx;
+  right: -100rpx;
+  height: 700rpx;
+  pointer-events: none;
+
+  .wave-circle {
+    position: absolute;
+    border-radius: 50%;
+  }
+
+  .c1 {
+    width: 700rpx;
+    height: 700rpx;
+    background: linear-gradient(135deg, #BAE0FF 0%, #91CAFF 100%);
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0.5;
+  }
+
+  .c2 {
+    width: 500rpx;
+    height: 500rpx;
+    background: linear-gradient(135deg, #E6F4FF 0%, #BAE0FF 100%);
+    top: -80rpx;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0.7;
+  }
+
+  .c3 {
+    width: 300rpx;
+    height: 300rpx;
+    background: #FFFFFF;
+    top: -40rpx;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0.4;
+  }
 }
 
 .login-container {
-  padding: 80rpx 48rpx;
+  position: relative;
+  z-index: 1;
+  padding: 0 32rpx 60rpx;
 }
 
 .logo-section {
-  text-align: center;
-  padding: 60rpx 0 80rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 240rpx 0 60rpx;
 
-  .logo-icon {
-    font-size: 100rpx;
-    display: block;
-    margin-bottom: 24rpx;
-  }
-
-  .logo-title {
-    font-size: 48rpx;
-    font-weight: 700;
-    color: #1f2937;
-    display: block;
-    margin-bottom: 12rpx;
-  }
-
-  .logo-subtitle {
-    font-size: 28rpx;
-    color: #6b7280;
-  }
-}
-
-.login-methods {
-  .login-btn {
-    width: 100%;
-    height: 96rpx;
-    border-radius: 48rpx;
-    font-size: 32rpx;
-    font-weight: 500;
+  .logo-icon-wrap {
+    width: 128rpx;
+    height: 128rpx;
+    background: #FFFFFF;
+    border-radius: 36rpx;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 24rpx;
-    border: none;
+    box-shadow: $shadow-lg;
+  }
 
-    .btn-icon {
-      margin-right: 12rpx;
-      font-size: 36rpx;
-    }
+  .logo-title {
+    font-size: 52rpx;
+    font-weight: 800;
+    color: $text-main;
+    margin-bottom: 10rpx;
+    letter-spacing: 2rpx;
+  }
 
-    &.wechat-btn {
-      background: #07c160;
-      color: #fff;
-    }
+  .logo-subtitle {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+  }
+}
 
-    &.phone-btn {
-      background: #fff;
-      color: #1f2937;
-      border: 2rpx solid #e5e7eb;
-    }
+.login-card {
+  background: $bg-card;
+  border-radius: $radius-lg;
+  padding: 40rpx;
+  box-shadow: $shadow-md;
+}
 
-    &.submit-btn {
-      background: #3b82f6;
-      color: #fff;
-      margin-top: 32rpx;
+.login-btn {
+  width: 100%;
+  height: 96rpx;
+  border-radius: $radius-md;
+  font-size: $font-size-base;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: $spacing-md;
+  border: none;
+  letter-spacing: 2rpx;
 
-      &.disabled {
-        background: #93c5fd;
-      }
+  .btn-icon {
+    margin-right: 14rpx;
+  }
+
+  &.wechat-btn {
+    background: #07C160;
+    color: #fff;
+  }
+
+  &.phone-quick-btn {
+    background: #E6F4FF;
+    color: $primary-color;
+    border: 1rpx solid #BAE0FF;
+  }
+
+  &.submit-btn {
+    background: $primary-gradient;
+    color: #fff;
+    margin-top: $spacing-lg;
+    box-shadow: $shadow-float;
+
+    &.disabled {
+      background: #BAE0FF;
+      box-shadow: none;
     }
   }
 }
@@ -368,18 +397,18 @@ export default {
 .divider {
   display: flex;
   align-items: center;
-  margin: 48rpx 0;
+  margin: $spacing-xl 0 $spacing-lg;
 
   .divider-line {
     flex: 1;
     height: 1rpx;
-    background: #e5e7eb;
+    background: $border-color;
   }
 
   .divider-text {
-    padding: 0 24rpx;
-    font-size: 26rpx;
-    color: #9ca3af;
+    padding: 0 $spacing-md;
+    font-size: $font-size-xs;
+    color: $text-placeholder;
   }
 }
 
@@ -387,41 +416,38 @@ export default {
   .input-group {
     display: flex;
     align-items: center;
-    background: #f9fafb;
-    border-radius: 16rpx;
-    padding: 0 24rpx;
-    margin-bottom: 24rpx;
-    border: 2rpx solid #e5e7eb;
+    background: $bg-color;
+    border-radius: $radius-md;
+    padding: 0 $spacing-md;
+    margin-bottom: $spacing-md;
+    border: 1rpx solid $border-color;
 
     .input-prefix {
-      font-size: 30rpx;
-      color: #1f2937;
-      padding-right: 16rpx;
-      border-right: 1rpx solid #e5e7eb;
-      margin-right: 16rpx;
+      font-size: $font-size-sm;
+      color: $text-secondary;
+      padding-right: $spacing-sm;
+      border-right: 1rpx solid $border-color;
+      margin-right: $spacing-sm;
     }
 
     .input {
       flex: 1;
       height: 96rpx;
-      font-size: 30rpx;
-      color: #1f2937;
-    }
-
-    .code-input {
-      flex: 1;
+      font-size: $font-size-base;
+      color: $text-main;
     }
 
     .send-code-btn {
-      padding: 16rpx 24rpx;
-      font-size: 26rpx;
-      color: #3b82f6;
+      padding: $spacing-xs $spacing-md;
+      font-size: $font-size-sm;
+      color: $primary-color;
       background: transparent;
       border: none;
+      font-weight: 600;
       white-space: nowrap;
 
       &.disabled {
-        color: #9ca3af;
+        color: $text-placeholder;
       }
     }
   }
@@ -429,14 +455,14 @@ export default {
 
 .agreement {
   text-align: center;
-  margin-top: 60rpx;
+  margin-top: 48rpx;
 
   .agreement-text {
-    font-size: 24rpx;
-    color: #9ca3af;
+    font-size: $font-size-xs;
+    color: $text-placeholder;
 
     .link {
-      color: #3b82f6;
+      color: $primary-color;
     }
   }
 }

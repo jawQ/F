@@ -8,7 +8,9 @@
         class="building-card"
       >
         <view class="building-info">
-          <text class="building-icon">🏢</text>
+          <view class="building-icon">
+            <uni-icons type="list" size="40" color="#1890FF"/>
+          </view>
           <view class="building-detail">
             <text class="building-name">{{ building.name }}</text>
             <text class="building-address">{{ building.address || '未设置地址' }}</text>
@@ -26,7 +28,9 @@
 
       <!-- 空状态 -->
       <view v-if="buildings.length === 0" class="empty-state">
-        <text class="empty-icon">🏗️</text>
+        <view class="empty-icon">
+          <uni-icons type="plusempty" size="80" color="#C2CAD9"/>
+        </view>
         <text class="empty-text">还没有添加楼栋</text>
         <text class="empty-tips">点击下方按钮添加您的第一个楼栋</text>
       </view>
@@ -261,7 +265,6 @@ export default {
       margin-bottom: 24rpx;
 
       .building-icon {
-        font-size: 80rpx;
         margin-right: 24rpx;
         background: $bg-color;
         border-radius: $radius-md;
@@ -347,7 +350,6 @@ export default {
   padding: 120rpx 0;
 
   .empty-icon {
-    font-size: 120rpx;
     margin-bottom: 32rpx;
     opacity: 0.8;
   }
@@ -418,7 +420,7 @@ export default {
   }
 
   .form-group {
-    margin-bottom: 32rpx;
+    margin-bottom: 28rpx;
 
     .form-label {
       font-size: $font-size-sm;
@@ -432,7 +434,7 @@ export default {
       width: 100%;
       height: 96rpx;
       background: $bg-color;
-      border: 2rpx solid transparent;
+      border: 1rpx solid $border-color;
       border-radius: $radius-md;
       padding: 0 32rpx;
       font-size: $font-size-base;

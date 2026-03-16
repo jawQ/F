@@ -47,10 +47,10 @@ export default {
 /* 全局样式 */
 
 page {
-  background-color: #f5f5f5;
+  background-color: $bg-color;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-  font-size: 28rpx;
-  color: #333;
+  font-size: $font-size-base;
+  color: $text-main;
   box-sizing: border-box;
 }
 
@@ -75,5 +75,11 @@ button::after {
 .safe-area-bottom {
   padding-bottom: constant(safe-area-inset-bottom);
   padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* iconfont 兼容 */
+.iconfont.icon-arrow-down::before {
+  content: '▾';
+  font-style: normal;
 }
 </style>
